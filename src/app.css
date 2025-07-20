@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Alata&family=Noto+Sans&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap&family=Nunito:ital,wght@0,200..1000;1,200..1000');
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme{
+    --font-jetbrains-mono: "JetBrains Mono", monospace;
+    --font-alata: "Alata", sans-serif;
+    --font-noto: "Noto Sans", sans-serif;
+    --font-nunito: "Nunito", sans-serif;
+    /* Primary (Purple) */
+    --color-primary-100: hsl(83, 27%, 90%);
+    --color-primary-200: hsl(83, 27%, 70%); /*main*/
+    --color-primary-300: hsl(83, 27%, 60%);
+    --color-primary-400: hsl(83, 27%, 45%);
+    --color-primary-500: hsl(83, 27%, 30%);
+
+    /* Secondary (Muted Violet) */
+    --color-secondary-100: hsl(180, 13%, 85%);
+    --color-secondary-200: hsl(180, 13%, 70%);
+    --color-secondary-300: hsl(180, 13%, 50%);
+    --color-secondary-400: hsl(180, 13%, 40%); /*main*/
+    --color-secondary-500: hsl(180, 13%, 20%);
+
+    /* Tertiary (Magenta-Rose) */
+    --color-tertiary-100: hsl(90, 10%, 85%);
+    --color-tertiary-200: hsl(90, 10%, 70%);
+    --color-tertiary-300: hsl(90, 10%, 63%); /*main*/
+    --color-tertiary-400: hsl(90, 10%, 40%);
+    --color-tertiary-500: hsl(90, 10%, 25%);
+
+    /* Surface (Dark Navy) */
+    --color-surface-100: hsl(210, 57%, 80%);
+    --color-surface-200: hsl(210, 57%, 60%);
+    --color-surface-300: hsl(210, 57%, 40%);
+    --color-surface-400: hsl(210, 57%, 25%);
+    --color-surface-500: hsl(210, 57%, 15%); /*main*/
+    --color-surface-dark: hsl(210, 57%, 5%); /*dark*/
+}
+*{
+    font-family: "Nunito", Roboto, sans-serif;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
