@@ -2,6 +2,7 @@ import TdClient, { type TdObject, type TdOptions } from 'tdweb';
 import options from '$lib/options';
 import { EncryptedStorage } from '$lib/storage/EncryptedStorage';
 import { goto } from '$app/navigation';
+import type { TdApi } from '$lib/types/td_api';
 
 class TdClientManager {
 	public static myInstance: TdClientManager | null = null;
@@ -33,6 +34,7 @@ class TdClientManager {
 	}
 
 	async onUpdate(update: TdObject) {
+		this.callback(update);
 		switch (update['@type']) {
 			case 'updateAuthorizationState':
 				await this.handleAuthorizationState(update['authorization_state'] as TdObject);
@@ -51,27 +53,32 @@ class TdClientManager {
 	}
 
 	private async sentTdlibParameters() {
+		const tdlibParameters: TdApi.setTdlibParameters = {
+			'@type': 'setTdlibParameters',
+			use_test_dc: false,
+			api_id: Number.parseInt(await EncryptedStorage.loadDecrypted('api_id') || "0"),
+			api_hash: (await EncryptedStorage.loadDecrypted('api_hash')) || '',
+			system_language_code: navigator.language || 'en',
+			device_model: 'Web Browser',
+			system_version: 'web',
+			application_version: '1.0.0',
+			database_directory: '/tdlib',
+			files_directory: "tdlib_files",
+			use_file_database: true,
+			use_chat_info_database: true,
+			use_message_database: true,
+			use_secret_chats: true
+		};
 		this.tdClient
-			.send({
-				'@type': 'setTdlibParameters',
-				use_test_dc: false,
-				api_id: Number.parseInt(await EncryptedStorage.loadDecrypted('api_id') || "0"),
-				api_hash: (await EncryptedStorage.loadDecrypted('api_hash')) || '',
-				system_language_code: navigator.language || 'en',
-				device_model: 'Web Browser',
-				system_version: 'web',
-				application_version: '1.0.0',
-				database_directory: '/tdlib',
-				use_file_database: true,
-				use_chat_info_database: true,
-				use_message_database: true,
-				use_secret_chats: true
-			})
+			.send(tdlibParameters as TdObject)
 			.then((r) => {
 				console.log(r);
 			});
 	}
 
+	public setCallback(callback: (update: TdObject) => void) {
+		this.callback = callback;
+	}
 }
 
 export default TdClientManager;

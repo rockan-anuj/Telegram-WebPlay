@@ -1,7 +1,52 @@
-<script>
+<script lang="ts">
+	import TdClientManager from '$lib/TdClientManager.js';
+	import { onMount } from 'svelte';
+	import TdClient, { type TdObject } from 'tdweb';
+	import { type TdApi } from '$lib/types/td_api';
+	import { goto } from '$app/navigation';
+
 	let btnFunc = $state('Get Otp');
+	let phoneNumber = $state('');
+	let otpNumber = $state('');
 	let otpSent = $state(false);
-	let onMainBtnClick;
+	let client:TdClient|null = null;
+	onMount(async () => {
+		let tdClientManager = await TdClientManager.getSingletonInstance();
+		client = tdClientManager.getClient();
+		tdClientManager.setCallback((update) => {
+			if (update['@type'] === 'updateAuthorizationState') {
+				let updateType = (update['authorization_state']) as TdApi.AuthorizationState;
+				if (updateType['@type'] === 'authorizationStateWaitPhoneNumber') {
+						otpSent = false;
+				}
+				if (updateType['@type'] === 'authorizationStateWaitCode') {
+						otpSent = true;
+				}
+				if (updateType['@type'] === 'authorizationStateReady') {
+						goto("../home",{replaceState:true});
+				}
+			}
+		});
+	})
+	let onMainBtnClick = async () => {
+		console.log(otpSent);
+		console.log(otpNumber);
+		let formattedPhone = (phoneNumber.includes('+')) ?  phoneNumber : '+'+phoneNumber;
+		if (!otpSent && phoneNumber.length >= 10) {
+			console.log(formattedPhone);
+			client?.send({ '@type': 'setAuthenticationPhoneNumber', phone_number: formattedPhone }).then((r) => {
+				console.log(r);
+				console.log("sent otp");
+				otpSent = true;
+				btnFunc = 'Verify Otp';
+			});
+		} else if (otpSent && otpNumber.length >= 2) {
+			console.log("verifying otp");
+			client?.send({ '@type': 'checkAuthenticationCode', code: otpNumber } as TdApi.checkAuthenticationCode as TdObject).then((r) => {
+				console.log(r);
+			});
+		}
+	};
 </script>
 
 <div class="h-dvh w-dvw flex flex-col md:flex-row bg-gradient-to-b from-[#334242] to-[#181918]">
@@ -12,14 +57,15 @@
 	<div class="flex-6 -translate-y-10 md:translate-y-0 flex-col gap-6 md:flex-1 justify-center items-center flex">
 		<p class="text-white md:mb-20 text-2xl md:text-5xl font-semibold">Mobile login</p>
 		{#if !otpSent}
-		<input type="number" placeholder="mobile number with country code"
-					 class="w-[90%] h-12 bg-[#D9D9D950] rounded-full pl-4 text-white placeholder-gray-400">
+			<input bind:value={phoneNumber} placeholder="mobile number with country code"
+						 class="w-[90%] h-12 bg-[#D9D9D950] rounded-full pl-4 text-white placeholder-gray-400">
 
 		{:else}
-		<input type="number" placeholder="enter otp sent on telegram"
-					 class="w-[90%] h-12 bg-[#D9D9D950] rounded-full pl-4 text-white placeholder-gray-400">
+			<input bind:value={otpNumber} type="string" placeholder="enter otp sent on telegram"
+						 class="w-[90%] h-12 bg-[#D9D9D950] rounded-full pl-4 text-white placeholder-gray-400">
 		{/if}
-		<button onclick={onMainBtnClick} class="w-[90%] h-12 bg-primary-400 rounded-full pl-4 text-white placeholder-gray-400">
+		<button onclick={onMainBtnClick}
+						class="w-[90%] h-12 bg-primary-400 rounded-full pl-4 text-white placeholder-gray-400">
 			{btnFunc}
 		</button>
 	</div>
