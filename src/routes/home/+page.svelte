@@ -4,14 +4,15 @@
 	import TdClientManager from '$lib/TdClientManager.js';
 	import type { TdApi } from '$lib/types/td_api';
 	import type { TdObject } from 'tdweb';
-	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { goto, pushState } from '$app/navigation';
 	import type { OrderedChat } from '$lib/utils/TelegramUtils';
 	import ChatView from '$lib/components/ChatView.svelte';
 
-	let chatList: OrderedChat[] = [];
-	let tdClientManager: TdClientManager;
+	let chatList: OrderedChat[] = $state([] as OrderedChat[]);
+	let tdClientManager: TdClientManager = $state(TdClientManager.myInstance as TdClientManager);
 
-	let chatOpen = true;
+	let currentChat: TdApi.Chat | undefined = $state();
 
 	function showList() {
 		let client = tdClientManager.getClient();
@@ -76,15 +77,39 @@
 					});
 					sortOrderedChat();
 				}
-				console.log(update);
-			}
+				//console.log(update);
+		}
 		);
 	}
 
 	onMount(async () => {
 		tdClientManager = await TdClientManager.getSingletonInstance();
 		setCallBack();
+		pushState('', {
+			showChat: false
+		});
+		setTimeout(() => {
+			currentChat = chatList[1]?.chatItem;
+			pushState('', {
+				showChat: true
+			});
+		}, 1000);
 	});
+
+	function onChatClicked(chatItem: TdApi.Chat) {
+		currentChat = chatItem;
+		console.log(chatItem);
+		pushState('', {
+			showChat: true
+		});
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	function closeChat() {
+		pushState('', {
+			showChat: false
+		});
+	}
 </script>
 
 <div class="h-dvh w-dvw flex flex-col bg-gradient-to-b from-[#334242] to-[#181918]">
@@ -94,15 +119,14 @@
 		<p class="text-white text-3xl pl-2 font-semibold">Chats</p>
 	</div>
 	<div class="overflow-y-scroll pt-22 flex  flex-col">
-		<div class=" p-4 gap-4 flex flex-col ">
+		<div class="p-4 gap-4 flex flex-col">
 			{#each chatList as chat (chat.chatItem.id)}
-				<ChatItem client={tdClientManager.getClient()} chatItemProp={chat.chatItem} />
+				<ChatItem onOpen={()=>onChatClicked(chat.chatItem)} client={tdClientManager.getClient()}
+									chatItemProp={chat.chatItem} />
 			{/each}
 		</div>
 	</div>
-	{#if chatOpen}
-		<ChatView className="absolute w-svw h-svh bg-gradient-to-b from-[#334242] to-[#181918]">
-
-		</ChatView>
+	{#if currentChat && page.state.showChat}
+		<ChatView currentChat={currentChat} className="absolute w-svw h-svh bg-gradient-to-b from-[#334242] to-[#181918]" />
 	{/if}
 </div>

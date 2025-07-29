@@ -5,7 +5,7 @@
 	import { onDestroy, onMount } from 'svelte';
 
 	let displayImageUrl: string = $state('../user.svg');
-	let { chatItemProp, client } = $props<{ chatItemProp: TdApi.chat, client: TdClient }>();
+	let { chatItemProp, client , onOpen } = $props<{ chatItemProp: TdApi.chat, client: TdClient , onOpen: (chatItem: TdApi.chat) => void }>();
 	let chatItem = $derived(chatItemProp as TdApi.chat);
 
 	let title = $derived((chatItem) ? chatItem.title : 'Telegram');
@@ -75,7 +75,7 @@
 	});
 </script>
 
-<div class="w-full rounded-2xl bg-[#ffffff11] h-20 flex flex-row items-center px-4">
+<div onclick={onOpen} class="w-full rounded-2xl bg-[#ffffff11] h-20 flex flex-row items-center px-4" tabindex="0" role="button"  onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && onOpen()}>
 	<img class="w-12 h-12 rounded-full" alt="profile" src={displayImageUrl} />
 
 	<div class="px-3 flex-1 h-max overflow-hidden">
