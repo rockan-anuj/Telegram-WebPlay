@@ -84,16 +84,13 @@
 
 	onMount(async () => {
 		tdClientManager = await TdClientManager.getSingletonInstance();
+		if (tdClientManager.isInitialized()) {
+				showList();
+		}
 		setCallBack();
 		pushState('', {
 			showChat: false
 		});
-		setTimeout(() => {
-			currentChat = chatList[1]?.chatItem;
-			pushState('', {
-				showChat: true
-			});
-		}, 1000);
 	});
 
 	function onChatClicked(chatItem: TdApi.Chat) {
@@ -114,7 +111,7 @@
 
 <div class="h-dvh w-dvw flex flex-col bg-gradient-to-b from-[#334242] to-[#181918]">
 	<div
-		class="px-8 pt-8 rounded-b-2xl absolute top-0 w-full pb-4 flex flex-row items-center gap-4 md:gap-10 backdrop-blur-2xl bg-[#22334422]">
+		class="px-9 pt-8 rounded-b-2xl absolute top-0 w-full pb-4 flex flex-row items-center gap-4 md:gap-10 backdrop-blur-2xl bg-[#22334422]">
 		<img class="shadow-[0_0_100px_#A7BA88] object-cover rounded-full size-10" src="./logo.svg" alt="logo">
 		<p class="text-white text-3xl pl-2 font-semibold">Chats</p>
 	</div>

@@ -70,7 +70,6 @@
 	onDestroy(() => {
 		if (displayImageUrl && displayImageUrl.startsWith('blob:')) {
 			URL.revokeObjectURL(displayImageUrl);
-			console.log(`Revoked object URL: ${displayImageUrl}`);
 		}
 	});
 </script>

@@ -40,8 +40,6 @@
 					messageList.push(value);
 				});
 				loading = false;
-				console.log(messages);
-				console.log(messageList);
 				loadMorePassObserver.observe(loadMoreElem);
 			}else{
 				console.log(chatsResponse);
@@ -51,7 +49,7 @@
 
 	onMount(async () => {
 		tdClientManager = await TdClientManager.getSingletonInstance();
-		fetchChatHistory(true);
+		await fetchChatHistory(true);
 	})
 
 	

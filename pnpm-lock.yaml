@@ -11,6 +11,9 @@ importers:
       '@types/tdweb':
         specifier: ^1.4.6
         version: 1.4.6
+      shaka-player:
+        specifier: ^4.15.9
+        version: 4.15.9
       tdweb:
         specifier: file:C:/Users/Lenovo/Downloads/tdweb-npm-package/tdweb-1.8.51.tgz
         version: file:C:/Users/Lenovo/Downloads/tdweb-npm-package/tdweb-1.8.51.tgz
@@ -1336,6 +1339,10 @@ packages:
   set-cookie-parser@2.7.1:
     resolution: {integrity: sha512-IOc8uWeOZgnb3ptbCURJWNjWUPcO3ZnTTdzsurqERrP6nPyv+paC55vJM0LpOlT2ne+Ix+9+CRG1MNLlyZ4GjQ==}
 
+  shaka-player@4.15.9:
+    resolution: {integrity: sha512-x8TElKG1eaj3nlcO9whvH1SbGvJ1gwSdgYlbvcJBNWsMJal70C2ZLk4w8qi8uXpcDjzSR8p28gYgD7WfOdHDGA==}
+    engines: {node: '>=18'}
+
   shebang-command@2.0.0:
     resolution: {integrity: sha512-kHxr2zZpYtdmrN1qDjrrX/Z1rR1kG8Dx+gkpK1G4eXmvXswmcE1hTWBWYUzlraYw1/yZp6YuDY77YtvbN0dmDA==}
     engines: {node: '>=8'}
@@ -2600,6 +2607,8 @@ snapshots:
   semver@7.7.2: {}
 
   set-cookie-parser@2.7.1: {}
+
+  shaka-player@4.15.9: {}
 
   shebang-command@2.0.0:
     dependencies:

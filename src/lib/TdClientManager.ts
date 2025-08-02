@@ -12,11 +12,16 @@ class TdClientManager {
 			console.log(update['@type']);
 		}
 	};
+	private initStatus: boolean = false;
 
 	private constructor() {
 		const options_tg = options as TdOptions;
 		options_tg.onUpdate = (update) => this.onUpdate(update);
 		this.tdClient = new TdClient(options_tg);
+	}
+
+	public isInitialized(): boolean {
+		return this.initStatus;
 	}
 
 	static async getSingletonInstance(): Promise<TdClientManager> {
@@ -45,10 +50,14 @@ class TdClientManager {
 
 	async handleAuthorizationState(authState: TdObject) {
 		if (authState['@type'] === 'authorizationStateWaitTdlibParameters') {
-			 await this.sentTdlibParameters();
+			this.initStatus = false;
+			await this.sentTdlibParameters();
 		}
 		if (authState['@type'] === 'authorizationStateWaitPhoneNumber') {
-			 await goto("../login",{replaceState:true});
+			await goto('../login', { replaceState: true });
+		}
+		if (authState['@type'] === 'authorizationStateReady') {
+			this.initStatus = true;
 		}
 	}
 
@@ -56,24 +65,20 @@ class TdClientManager {
 		const tdlibParameters: TdApi.setTdlibParameters = {
 			'@type': 'setTdlibParameters',
 			use_test_dc: false,
-			api_id: Number.parseInt(await EncryptedStorage.loadDecrypted('api_id') || "0"),
+			api_id: Number.parseInt((await EncryptedStorage.loadDecrypted('api_id')) || '0'),
 			api_hash: (await EncryptedStorage.loadDecrypted('api_hash')) || '',
 			system_language_code: navigator.language || 'en',
 			device_model: 'Web Browser',
 			system_version: 'web',
 			application_version: '1.0.0',
-			database_directory: '/tdlib',
-			files_directory: "tdlib_files",
 			use_file_database: true,
 			use_chat_info_database: true,
 			use_message_database: true,
 			use_secret_chats: true
 		};
-		this.tdClient
-			.send(tdlibParameters as TdObject)
-			.then((r) => {
-				console.log(r);
-			});
+		this.tdClient.send(tdlibParameters as TdObject).then((r) => {
+			console.log(r);
+		});
 	}
 
 	public setCallback(callback: (update: TdObject) => void) {

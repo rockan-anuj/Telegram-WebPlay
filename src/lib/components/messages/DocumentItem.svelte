@@ -3,6 +3,7 @@
 	import TdClient, { type TdObject } from 'tdweb';
 	import { onDestroy, onMount } from 'svelte';
 	import { TelegramUtils } from '$lib/utils/TelegramUtils';
+	import { goto } from '$app/navigation';
 
 	let docImg: string = $state('../placeholder.svg');
 	let { messageItem, client } = $props<{ messageItem: TdApi.message, client: TdClient }>();
@@ -11,14 +12,14 @@
 	let colorTitle = $derived.by(() => {
 		return `hsl(${[messageSender].reduce((acc, char) => (acc + char.charCodeAt(0)), 0) % 256}, 60%, 70%)`;
 	});
-	let messageSender = $state("");
+	let messageSender = $state('');
 	onMount(async () => {
 		if (message.sender_id['@type'] == 'messageSenderUser') {
 			let user = await client.send({
-				'@type':"getUser",
+				'@type': 'getUser',
 				user_id: (message.sender_id as TdApi.messageSenderUser).user_id
 			} as TdApi.getUser) as TdApi.user;
-			messageSender = user.first_name + " " + user.last_name;
+			messageSender = user.first_name + ' ' + user.last_name;
 		}
 
 
@@ -78,18 +79,18 @@
 
 
 	onMount(() => {
-		if(messageDoc.document.thumbnail){
+		if (messageDoc.document.thumbnail) {
 			showImage(messageDoc.document.thumbnail.file);
 		}
 	});
 	onDestroy(() => {
 		if (docImg && docImg.startsWith('blob:')) {
 			URL.revokeObjectURL(docImg);
-			console.log(`Revoked object URL: ${docImg}`);
 		}
 	});
-	function formatSize(bytes : number) {
-		const units = ["Bytes", "KB", "MB", "GB", "TB"];
+
+	function formatSize(bytes: number) {
+		const units = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
 		let unitIndex = 0;
 		let size = bytes;
 
@@ -100,6 +101,13 @@
 
 		return `${size.toFixed(2)} ${units[unitIndex]}`;
 	}
+
+	function playMessage() {
+		if (messageDoc.document.mime_type.startsWith("video")) {
+			localStorage.setItem("currentPlayMessage", JSON.stringify(message));
+			goto("../player", { replaceState: false });
+		}
+	}
 </script>
 
 <div class="w-full rounded-xl p-2 bg-[#ffffff11] flex flex-col">
@@ -107,11 +115,13 @@
 	<div class="w-full rounded-2xl bg-[#ffffff11] h-20 flex flex-row items-center px-4">
 		<div class="w-12 h-12 rounded-full block relative">
 			<img class="absolute w-12 h-12 rounded-full mask-alpha opacity-70" alt="profile" src={docImg} />
-			<img class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  w-5 h-5 rounded-full" alt="play" src="../play.svg" />
+			<button onclick={playMessage}
+					 class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[url('../play.svg')] w-5 h-5 rounded-full"
+			/>
 		</div>
 		<div class="px-2 flex-1 h-max overflow-hidden">
 			<p class="font-semibold text-[0.9rem] text-white">{messageDoc.document.file_name}</p>
-			<p class="text-xs text-gray-300 truncate"> {formatSize(messageDoc.document.document.size)} </p>
+			<p class="text-xs text-gray-300 truncate"> {formatSize(messageDoc.document.document.size)+ " - " + messageDoc.document.mime_type} </p>
 		</div>
 	</div>
 	<pre class="text-gray-300 text-[0.9rem] m-2">{TelegramUtils.getTagFromMsg(message)}</pre>
