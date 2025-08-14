@@ -15,8 +15,8 @@ importers:
         specifier: ^4.15.9
         version: 4.15.9
       tdweb:
-        specifier: file:C:/Users/Lenovo/Downloads/tdweb-npm-package/tdweb-1.8.51.tgz
-        version: file:C:/Users/Lenovo/Downloads/tdweb-npm-package/tdweb-1.8.51.tgz
+        specifier: ./tdweb-npm-package/tdweb-1.8.51.tgz
+        version: file:tdweb-npm-package/tdweb-1.8.51.tgz
     devDependencies:
       '@eslint/compat':
         specifier: ^1.2.5
@@ -1398,8 +1398,8 @@ packages:
     resolution: {integrity: sha512-5S7Va8hKfV7W5U6g3aYxXmlPoZVAwUMy9AOKyF2fVuZa2UD3qZjg578OrLRt8PcNN1PleVaL/5/yYATNL0ICUw==}
     engines: {node: '>=18'}
 
-  tdweb@file:C:/Users/Lenovo/Downloads/tdweb-npm-package/tdweb-1.8.51.tgz:
-    resolution: {integrity: sha512-TqkWtL5FecwlGjyXAQUigpzrBuBsg2sd1Gnp12tONdmASXiZqFD+AY9CbtGea8QzoJur0NaZ2W7G12Vdu6J5Vg==, tarball: file:C:/Users/Lenovo/Downloads/tdweb-npm-package/tdweb-1.8.51.tgz}
+  tdweb@file:tdweb-npm-package/tdweb-1.8.51.tgz:
+    resolution: {integrity: sha512-TqkWtL5FecwlGjyXAQUigpzrBuBsg2sd1Gnp12tONdmASXiZqFD+AY9CbtGea8QzoJur0NaZ2W7G12Vdu6J5Vg==, tarball: file:tdweb-npm-package/tdweb-1.8.51.tgz}
     version: 1.8.51
 
   tinyglobby@0.2.14:
@@ -2682,7 +2682,7 @@ snapshots:
       mkdirp: 3.0.1
       yallist: 5.0.0
 
-  tdweb@file:C:/Users/Lenovo/Downloads/tdweb-npm-package/tdweb-1.8.51.tgz:
+  tdweb@file:tdweb-npm-package/tdweb-1.8.51.tgz:
     dependencies:
       '@babel/runtime': 7.27.6
       broadcast-channel: 2.3.4

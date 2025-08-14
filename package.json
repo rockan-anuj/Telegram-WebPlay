@@ -43,6 +43,6 @@
 	"dependencies": {
 		"@types/tdweb": "^1.4.6",
 		"shaka-player": "^4.15.9",
-		"tdweb": "file:C:/Users/Lenovo/Downloads/tdweb-npm-package/tdweb-1.8.51.tgz"
+		"tdweb": "./tdweb-npm-package/tdweb-1.8.51.tgz"
 	}
 }
