@@ -10,7 +10,8 @@
 	import ChatView from '$lib/components/ChatView.svelte';
 
 	import type { LayoutLoad } from '../$lib/types';
-	let { data } = $props<{data:LayoutLoad}>();
+
+	let { data } = $props<{ data: LayoutLoad }>();
 	let tdClientManager: TdClientManager = data.tdClientManager as TdClientManager;
 	let client = data.client as TdClient;
 	let chatList: OrderedChat[] = $state([] as OrderedChat[]);
@@ -29,15 +30,9 @@
 		} as TdApi.loadChats as TdObject).then((r) => {
 			console.log(r);
 		});
+		chatList = tdClientManager.chatList;
 	}
 
-	function sortOrderedChat() {
-		chatList = chatList.sort((a, b) => {
-			const orderA = parseInt(a.order, 10);
-			const orderB = parseInt(b.order, 10);
-			return orderB - orderA;
-		});
-	}
 
 	function setCallBack() {
 		tdClientManager.setCallback((update) => {
@@ -49,40 +44,14 @@
 					if (updateType['@type'] === 'authorizationStateReady') {
 						showList();
 					}
-				} else if (update['@type'] === 'updateNewChat') {
-					const newChat = update.chat as unknown as TdApi.Chat;
-
-					if (!chatList.some(chat => chat.chatItem.id === newChat.id)) {
-						chatList = [...chatList, { order: '0', chatItem: newChat } as OrderedChat];
-					}
-					sortOrderedChat();
-				} else if (update['@type'] === 'updateChatLastMessage') {
-					const chatId = update.chat_id;
-					const updatedLastMessage = update.last_message as unknown as TdApi.Message;
-					chatList = chatList.map(chat => {
-						if (chat.chatItem.id === chatId) {
-							const updatedChatItem = {
-								...chat.chatItem,
-								last_message: updatedLastMessage
-							};
-							return { ...chat, chatItem: updatedChatItem };
-						}
-						return chat;
-					});
-					sortOrderedChat();
-				} else if (update['@type'] === 'updateChatPosition') {
-					const updateChatPosition = update as unknown as TdApi.updateChatPosition;
-					chatList = chatList.map(chat => {
-						if (chat.chatItem.id === update.chat_id) {
-							return { ...chat, order: updateChatPosition.position.order };
-						}
-						return chat;
-					});
-					sortOrderedChat();
+				}
+				if (update['@type'] === 'updateNewChat' || update['@type'] === 'updateChatLastMessage' || update['@type'] === 'updateChatPosition') {
+					chatList = tdClientManager.chatList;
 				}
 				//console.log(update);
-		}
+			}
 		);
+
 	}
 
 	onMount(async () => {
@@ -90,11 +59,12 @@
 			await new Promise(resolve => setTimeout(resolve, 100));
 			console.log('Waiting for TDLib to initialize...');
 		}
-		showList();
-		setCallBack();
 		pushState('', {
 			showChat: false
 		});
+		showList();
+		setCallBack();
+
 	});
 
 	function onChatClicked(chatItem: TdApi.Chat) {
@@ -122,7 +92,7 @@
 	<div class="overflow-y-scroll pt-22 flex  flex-col">
 		<div class="p-4 gap-4 flex flex-col">
 			{#each chatList as chat (chat.chatItem.id)}
-				<ChatItem onOpen={()=>onChatClicked(chat.chatItem)} client={tdClientManager.getClient()}
+				<ChatItem onOpen={()=>onChatClicked(chat.chatItem)} client={client}
 									chatItemProp={chat.chatItem} />
 			{/each}
 		</div>

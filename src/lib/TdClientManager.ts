@@ -3,10 +3,13 @@ import options from '$lib/options';
 import { EncryptedStorage } from '$lib/storage/EncryptedStorage';
 import { goto } from '$app/navigation';
 import type { TdApi } from '$lib/types/td_api';
+import type { OrderedChat } from '$lib/utils/TelegramUtils';
 
 class TdClientManager {
 	public static myInstance: TdClientManager | null = null;
 	private tdClient: TdClient;
+	public chatList: OrderedChat[] = [];
+
 	public callback = (update: TdObject) => {
 		if (update['@type'] === 'updateAuthorizationState') {
 			console.log(update['@type']);
@@ -38,6 +41,14 @@ class TdClientManager {
 		return this.tdClient;
 	}
 
+	sortOrderedChat() {
+		this.chatList = this.chatList.sort((a, b) => {
+			const orderA = parseInt(a.order, 10);
+			const orderB = parseInt(b.order, 10);
+			return orderB - orderA;
+		});
+	}
+
 	async onUpdate(update: TdObject) {
 		this.callback(update);
 		switch (update['@type']) {
@@ -45,6 +56,37 @@ class TdClientManager {
 				await this.handleAuthorizationState(update['authorization_state'] as TdObject);
 				console.log(update);
 				break;
+		}
+		if (update['@type'] === 'updateNewChat') {
+			const newChat = update.chat as unknown as TdApi.Chat;
+
+			if (!this.chatList.some((chat) => chat.chatItem.id === newChat.id)) {
+				this.chatList = [...this.chatList, { order: '0', chatItem: newChat } as OrderedChat];
+			}
+			this.sortOrderedChat();
+		} else if (update['@type'] === 'updateChatLastMessage') {
+			const chatId = update.chat_id;
+			const updatedLastMessage = update.last_message as unknown as TdApi.Message;
+			this.chatList = this.chatList.map((chat) => {
+				if (chat.chatItem.id === chatId) {
+					const updatedChatItem = {
+						...chat.chatItem,
+						last_message: updatedLastMessage
+					};
+					return { ...chat, chatItem: updatedChatItem };
+				}
+				return chat;
+			});
+			this.sortOrderedChat();
+		} else if (update['@type'] === 'updateChatPosition') {
+			const updateChatPosition = update as unknown as TdApi.updateChatPosition;
+			this.chatList = this.chatList.map((chat) => {
+				if (chat.chatItem.id === update.chat_id) {
+					return { ...chat, order: updateChatPosition.position.order };
+				}
+				return chat;
+			});
+			this.sortOrderedChat();
 		}
 	}
 
@@ -79,7 +121,6 @@ class TdClientManager {
 		this.tdClient.send(tdlibParameters as TdObject).then((r) => {
 			console.log(r);
 		});
-
 	}
 
 	public setCallback(callback: (update: TdObject) => void) {
