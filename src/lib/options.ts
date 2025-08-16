@@ -6,5 +6,5 @@ export default {
     logVerbosityLevel: 2, // The initial verbosity level for the TDLib internal logging (0-1023).
     useDatabase: true, // Pass false to use TDLib without database and secret chats. It will significantly improve loading time, but some functionality will be unavailable.
     readOnly: false, // For debug only. Pass true to open TDLib database in read-only mode
-    mode: 'auto', // For debug only. The type of the TDLib build to use. 'asmjs' for asm.js and 'wasm' for WebAssembly. If mode == 'auto' WebAbassembly will be used if supported by browser, asm.js otherwise.
+    mode: 'wasm', // For debug only. The type of the TDLib build to use. 'asmjs' for asm.js and 'wasm' for WebAssembly. If mode == 'auto' WebAbassembly will be used if supported by browser, asm.js otherwise.
 };

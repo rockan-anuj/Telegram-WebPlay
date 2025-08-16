@@ -115,9 +115,8 @@
 	<div class="w-full rounded-2xl bg-[#ffffff11] h-20 flex flex-row items-center px-4">
 		<div class="w-12 h-12 rounded-full block relative">
 			<img class="absolute w-12 h-12 rounded-full mask-alpha opacity-70" alt="profile" src={docImg} />
-			<button onclick={playMessage}
-					 class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[url('../play.svg')] w-5 h-5 rounded-full"
-			/>
+			<button aria-label="play" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[url('../play.svg')] w-5 h-5 rounded-full"
+							onclick={playMessage}></button>
 		</div>
 		<div class="px-2 flex-1 h-max overflow-hidden">
 			<p class="font-semibold text-[0.9rem] text-white">{messageDoc.document.file_name}</p>

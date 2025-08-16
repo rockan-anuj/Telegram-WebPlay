@@ -3,19 +3,22 @@
 	import { onMount } from 'svelte';
 	import TdClientManager from '$lib/TdClientManager.js';
 	import type { TdApi } from '$lib/types/td_api';
-	import type { TdObject } from 'tdweb';
+	import TdClient, { type TdObject } from 'tdweb';
 	import { page } from '$app/state';
 	import { goto, pushState } from '$app/navigation';
 	import type { OrderedChat } from '$lib/utils/TelegramUtils';
 	import ChatView from '$lib/components/ChatView.svelte';
 
+	import type { LayoutLoad } from '../$lib/types';
+	let { data } = $props<{data:LayoutLoad}>();
+	let tdClientManager: TdClientManager = data.tdClientManager as TdClientManager;
+	let client = data.client as TdClient;
 	let chatList: OrderedChat[] = $state([] as OrderedChat[]);
-	let tdClientManager: TdClientManager = $state(TdClientManager.myInstance as TdClientManager);
+
 
 	let currentChat: TdApi.Chat | undefined = $state();
 
 	function showList() {
-		let client = tdClientManager.getClient();
 		console.log('Fetching Chats');
 		client.send({
 			'@type': 'loadChats',
@@ -83,10 +86,11 @@
 	}
 
 	onMount(async () => {
-		tdClientManager = await TdClientManager.getSingletonInstance();
-		if (tdClientManager.isInitialized()) {
-				showList();
+		while (!tdClientManager.isInitialized()) {
+			await new Promise(resolve => setTimeout(resolve, 100));
+			console.log('Waiting for TDLib to initialize...');
 		}
+		showList();
 		setCallBack();
 		pushState('', {
 			showChat: false

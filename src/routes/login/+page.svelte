@@ -1,18 +1,21 @@
 <script lang="ts">
-	import TdClientManager from '$lib/TdClientManager.js';
 	import { onMount } from 'svelte';
 	import TdClient, { type TdObject } from 'tdweb';
 	import { type TdApi } from '$lib/types/td_api';
 	import { goto } from '$app/navigation';
+	import type TdClientManager from '$lib/TdClientManager';
 
+	import type { LayoutLoad } from '../$lib/types';
+	let { data } = $props<{data:LayoutLoad}>();
+	let tdClientManager: TdClientManager = data.tdClientManager as TdClientManager;
+
+	let client = data.client as TdClient;
 	let btnFunc = $state('Get Otp');
 	let phoneNumber = $state('');
 	let otpNumber = $state('');
 	let otpSent = $state(false);
-	let client:TdClient|null = null;
+
 	onMount(async () => {
-		let tdClientManager = await TdClientManager.getSingletonInstance();
-		client = tdClientManager.getClient();
 		tdClientManager.setCallback((update) => {
 			if (update['@type'] === 'updateAuthorizationState') {
 				let updateType = (update['authorization_state']) as TdApi.AuthorizationState;
@@ -33,8 +36,8 @@
 		console.log(otpNumber);
 		let formattedPhone = (phoneNumber.includes('+')) ?  phoneNumber : '+'+phoneNumber;
 		if (!otpSent && phoneNumber.length >= 10) {
-			console.log(formattedPhone);
-			client?.send({ '@type': 'setAuthenticationPhoneNumber', phone_number: formattedPhone }).then((r) => {
+			console.log("Sending otp to"+formattedPhone);
+			client.send({ '@type': 'setAuthenticationPhoneNumber', phone_number: formattedPhone }).then((r) => {
 				console.log(r);
 				console.log("sent otp");
 				otpSent = true;
@@ -42,7 +45,7 @@
 			});
 		} else if (otpSent && otpNumber.length >= 2) {
 			console.log("verifying otp");
-			client?.send({ '@type': 'checkAuthenticationCode', code: otpNumber } as TdApi.checkAuthenticationCode as TdObject).then((r) => {
+			client.send({ '@type': 'checkAuthenticationCode', code: otpNumber } as TdApi.checkAuthenticationCode as TdObject).then((r) => {
 				console.log(r);
 			});
 		}

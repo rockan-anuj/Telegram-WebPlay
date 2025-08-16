@@ -11,6 +11,13 @@ declare global {
 		// interface Platform {}
 	}
 
+	interface Window {
+		readCurrentVideoFile: (offset: number,length: number) => Promise<ArrayBuffer>;
+		electronAPI: {
+			videoReady: (size:number) => void;
+		};
+	}
+
 
 }
 export {};

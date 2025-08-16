@@ -25,5 +25,6 @@
 			}
     });
 </script>
-
-<h1>Welcome to Telegram Web Play</h1>
+<div class="h-dvh w-dvw flex justify-center item-center bg-surface-dark text-center">
+	<h1 class="text-slate-300 h-dvh text-center p-40 font-bold">Initialising TG Play</h1>
+</div>

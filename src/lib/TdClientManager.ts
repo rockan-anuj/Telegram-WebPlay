@@ -79,6 +79,7 @@ class TdClientManager {
 		this.tdClient.send(tdlibParameters as TdObject).then((r) => {
 			console.log(r);
 		});
+
 	}
 
 	public setCallback(callback: (update: TdObject) => void) {
